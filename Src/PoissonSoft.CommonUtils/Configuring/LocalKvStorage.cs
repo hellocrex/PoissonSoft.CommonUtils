@@ -76,7 +76,7 @@ namespace PoissonSoft.CommonUtils.Configuring
 
             var data = GetFileData();
 
-            if (data.ContainsKey(key)) return data[key];
+            if (data?.Any() == true && data.ContainsKey(key)) return data[key];
 
             // Try read from Environment variable
             var res = Environment.GetEnvironmentVariable(key, EnvironmentVariableTarget.User);
