@@ -107,12 +107,13 @@ namespace PoissonSoft.CommonUtils.ConsoleUtils
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Globalization", "CA1303:Do not pass literals as localized parameters", Justification = "<Pending>")]
         public static ConsoleKey GetUserAction(string description, Dictionary<ConsoleKey, string> availableActions)
         {
-            if (availableActions == null) availableActions = new Dictionary<ConsoleKey, string> { { ConsoleKey.Y, "Yes" }};
+            availableActions ??= new Dictionary<ConsoleKey, string> {{ConsoleKey.Y, "Yes"}};
             Console.WriteLine(description);
             Console.WriteLine(string.Join("\n", availableActions.Select(x => $"[{x.Key}] {x.Value}")));
             while (true)
             {
-                ConsoleKey k = Console.ReadKey().Key;
+                var option = Console.ReadKey();
+                var k = option.Key;
                 if (availableActions.ContainsKey(k))
                 {
                     Console.WriteLine();
