@@ -98,6 +98,24 @@ namespace PoissonSoft.CommonUtils.ConsoleUtils
             return result;
         }
 
+        public static T GetEnum<T>(string message)
+        {
+            var type = typeof(T);
+            if (!type.IsEnum) return default;
+
+            var itemsString = string.Join("|", Enum.GetNames(type));
+            var msg = $"{message} ({itemsString})";
+
+            T result;
+            do
+            {
+                Console.WriteLine(msg);
+            }
+            while (!Enum.TryParse(Console.ReadLine(), out result));
+
+            return result;
+        }
+
         /// <summary>
         /// Выбор пользователем действия из предложенных вариантов
         /// </summary>
