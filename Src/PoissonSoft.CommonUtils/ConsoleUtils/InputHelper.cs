@@ -98,15 +98,20 @@ namespace PoissonSoft.CommonUtils.ConsoleUtils
             return result;
         }
 
-        public static T GetEnum<T>(string message)
+        /// <summary>
+        /// Получение Enum от пользователя
+        /// </summary>
+        /// <param name="message"></param>
+        /// <returns></returns>
+        public static TEnum GetEnum<TEnum>(string message) where TEnum : struct
         {
-            var type = typeof(T);
+            var type = typeof(TEnum);
             if (!type.IsEnum) return default;
 
             var itemsString = string.Join("|", Enum.GetNames(type));
             var msg = $"{message} ({itemsString})";
 
-            T result;
+            TEnum result;
             do
             {
                 Console.WriteLine(msg);
