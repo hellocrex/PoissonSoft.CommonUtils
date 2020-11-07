@@ -99,6 +99,22 @@ namespace PoissonSoft.CommonUtils.ConsoleUtils
         }
 
         /// <summary>
+        /// Получение от пользователя числа decimal
+        /// </summary>
+        /// <param name="message"></param>
+        /// <returns></returns>
+        public static decimal GetDecimal(string message)
+        {
+            decimal result;
+            do
+            {
+                Console.WriteLine(message);
+            }
+            while (!decimal.TryParse(Console.ReadLine(), out result));
+            return result;
+        }
+
+        /// <summary>
         /// Получение Enum от пользователя
         /// </summary>
         /// <param name="message"></param>
