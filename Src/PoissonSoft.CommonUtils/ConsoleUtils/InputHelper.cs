@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 
 namespace PoissonSoft.CommonUtils.ConsoleUtils
@@ -109,8 +110,8 @@ namespace PoissonSoft.CommonUtils.ConsoleUtils
             do
             {
                 Console.WriteLine(message);
-            }
-            while (!decimal.TryParse(Console.ReadLine(), out result));
+            } while (!decimal.TryParse(Console.ReadLine(), NumberStyles.Float, CultureInfo.InvariantCulture,
+                out result));
             return result;
         }
 
