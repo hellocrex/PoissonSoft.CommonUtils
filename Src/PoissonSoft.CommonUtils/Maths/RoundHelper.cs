@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace PoissonSoft.CommonUtils.MathUtils
+namespace PoissonSoft.CommonUtils.Maths
 {
     /// <summary>
     /// Утилиты для округления

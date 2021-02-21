@@ -3,9 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.29911.84
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PoissonSoft.CommonUtils", "PoissonSoft.CommonUtils\PoissonSoft.CommonUtils.csproj", "{BC9BBFEA-5740-4048-B58F-767BB5BB0602}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PoissonSoft.CommonUtils", "PoissonSoft.CommonUtils\PoissonSoft.CommonUtils.csproj", "{BC9BBFEA-5740-4048-B58F-767BB5BB0602}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PoissonSoft.CommonUtils.Tests", "PoissonSoft.CommonUtils.Tests\PoissonSoft.CommonUtils.Tests.csproj", "{3AC15FA6-9C2F-463B-B49A-2571BDC90459}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PoissonSoft.CommonUtils.Tests", "PoissonSoft.CommonUtils.Tests\PoissonSoft.CommonUtils.Tests.csproj", "{3AC15FA6-9C2F-463B-B49A-2571BDC90459}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "PoissonSoft.PostgresUtils", "PoissonSoft.PostgresUtils\PoissonSoft.PostgresUtils.csproj", "{12CA31B3-0D6E-468E-8583-C2B2C3EEF4C8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{3AC15FA6-9C2F-463B-B49A-2571BDC90459}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3AC15FA6-9C2F-463B-B49A-2571BDC90459}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3AC15FA6-9C2F-463B-B49A-2571BDC90459}.Release|Any CPU.Build.0 = Release|Any CPU
+		{12CA31B3-0D6E-468E-8583-C2B2C3EEF4C8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{12CA31B3-0D6E-468E-8583-C2B2C3EEF4C8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{12CA31B3-0D6E-468E-8583-C2B2C3EEF4C8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{12CA31B3-0D6E-468E-8583-C2B2C3EEF4C8}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

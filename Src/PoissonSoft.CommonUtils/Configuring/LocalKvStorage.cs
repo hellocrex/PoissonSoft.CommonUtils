@@ -60,7 +60,7 @@ namespace PoissonSoft.CommonUtils.Configuring
         {
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
-                return Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "PoissonSoft\\Environment\\vars.xml");
+                return Path.Combine(System.Environment.GetFolderPath(System.Environment.SpecialFolder.ApplicationData), "PoissonSoft\\Environment\\vars.xml");
             }
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
             {
