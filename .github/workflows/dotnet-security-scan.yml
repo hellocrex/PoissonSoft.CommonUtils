@@ -37,3 +37,9 @@ jobs:
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v1
+        
+      - name: Upload report
+        uses: actions/upload-artifact@v2
+        with:
+          name: report.sarif
+          path: /home/runner/work/PoissonSoft.CommonUtils/results/csharp-builtin.sarif
