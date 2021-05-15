@@ -12,17 +12,16 @@ namespace PoissonSoft.PostgresUtils.Migrations
     public class SimpleDbMigrationHelper : IMigrationHelper
     {
         private readonly PostgresConnectionSettings connectionSettings;
-        private readonly PostgresHelper postgresHelper;
-        private readonly Type baseMigrationType;
+        private readonly IPostgresHelper postgresHelper;
+        private readonly Type baseMigrationType = typeof(SimpleDbMigrationBase);
         Func<string, IDbConnection> getDbConnection;
 
         /// <inheritdoc />
         public SimpleDbMigrationHelper(PostgresConnectionSettings connectionSettings, 
-            PostgresHelper postgresHelper, Type baseMigrationType)
+            IPostgresHelper postgresHelper)
         {
             this.connectionSettings = connectionSettings ?? throw new ArgumentNullException(nameof(connectionSettings));
             this.postgresHelper = postgresHelper ?? throw new ArgumentNullException(nameof(postgresHelper));
-            this.baseMigrationType = baseMigrationType ?? throw new ArgumentNullException(nameof(baseMigrationType));
             getDbConnection = (s =>
             {
                 var conn = new Npgsql.NpgsqlConnection(s);

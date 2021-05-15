@@ -20,14 +20,13 @@ namespace PoissonSoft.PostgresUtils
         /// Create simple postgres connection factory 
         /// </summary>
         /// <param name="dbSettings">Postgres connection settings</param>
-        /// <param name="connectionFactoryFromCs">Factory for create connection from connectionstring</param>
-        public PostgresConnectionFactory(PostgresConnectionSettings dbSettings, Func<string, IDbConnection> connectionFactoryFromCs)
+        public PostgresConnectionFactory(PostgresConnectionSettings dbSettings)
         {
             this.connectionString = dbSettings.GetConnectionStringBuilder();
             this.connectionString = connectionString ?? throw new ArgumentNullException(nameof(connectionString));
             this.connectionFactory = () =>
             {
-                var conn = connectionFactoryFromCs(connectionString.ConnectionString);
+                var conn = new Npgsql.NpgsqlConnection(connectionString.ConnectionString);
                 conn.Open();
                 return conn;
             };

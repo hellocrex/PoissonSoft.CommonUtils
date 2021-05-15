@@ -11,6 +11,7 @@ namespace PoissonSoft.Data.Migrator
     public class Migrator : IMigrator
     {
         readonly IMigrationHelper migrationHelper;
+        readonly IReadOnlyCollection<MigrationBase> migrations;
 
         /// <summary>
         /// Creating an instance of the migrator
@@ -19,6 +20,15 @@ namespace PoissonSoft.Data.Migrator
         public Migrator(IMigrationHelper migrationHelper)
         {
             this.migrationHelper = migrationHelper ?? throw new ArgumentNullException(nameof(migrationHelper));
+            migrations = GetMigrationsFromCurrentAppDomain();
+        }
+
+        /// <inheritdoc />
+        public bool IsOwnDbSchemeOutdated()
+        {
+            var currentDbVersion = migrationHelper.GetCurrentDbVersion();
+            var currentVersionOwnMigrations = migrations.Max(m => m.Version);
+            return currentDbVersion > currentVersionOwnMigrations;
         }
 
         /// <summary>
@@ -28,7 +38,6 @@ namespace PoissonSoft.Data.Migrator
         public int Migrate()
         {
             Trace.TraceInformation($"Starting db migration...");
-            var migrations = GetMigrationsFromCurrentAppDomain();
 
             if (migrations is null)
             {

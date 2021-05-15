@@ -11,7 +11,34 @@ namespace PoissonSoft.PostgresUtils
     /// <summary>
     /// Helper for working with postgres
     /// </summary>
-    public class PostgresHelper
+    public interface IPostgresHelper
+    {
+        /// <summary>
+        /// Create database
+        /// </summary>
+        /// <param name="settings">Settings with database name</param>
+        void CreateDatabase(PostgresConnectionSettings settings);
+        /// <summary>
+        /// Create database with given name
+        /// </summary>
+        /// <param name="settings"></param>
+        void CreateDatabaseIfNotExists(PostgresConnectionSettings settings);
+        /// <summary>
+        /// Check if database already exists
+        /// </summary>
+        /// <param name="settings">Settings with database name</param>
+        /// <returns></returns>
+        bool IsDatabaseExists(PostgresConnectionSettings settings);
+        /// <summary>
+        /// Waiting for a start of database
+        /// </summary>
+        /// <param name="settings">Database settings</param>
+        /// <param name="waitMs">Time in milliseconds</param>
+        void WaitTillDbStarting(PostgresConnectionSettings settings, int waitMs = 5000);
+    }
+
+    /// <inheritdoc />
+    public class PostgresHelper : IPostgresHelper
     {
         /// <summary>
         /// Create the connection from connection string
@@ -24,11 +51,7 @@ namespace PoissonSoft.PostgresUtils
             return conn;
         }
 
-        /// <summary>
-        /// Waiting for a start of database
-        /// </summary>
-        /// <param name="settings">Database settings</param>
-        /// <param name="waitMs">Time in milliseconds</param>
+        /// <inheritdoc />
         public void WaitTillDbStarting(PostgresConnectionSettings settings, int waitMs = 5000)
         {
             var cs = settings.GetConnectionStringToServer().ConnectionString;
@@ -55,10 +78,7 @@ namespace PoissonSoft.PostgresUtils
             }
         }
 
-        /// <summary>
-        /// Create database
-        /// </summary>
-        /// <param name="settings">Settings with database name</param>
+        /// <inheritdoc />
         public void CreateDatabase(PostgresConnectionSettings settings)
         {
             using var conn = GetConnection(settings.GetConnectionStringToServer().ConnectionString);
@@ -84,11 +104,7 @@ namespace PoissonSoft.PostgresUtils
             }
         }
 
-        /// <summary>
-        /// Check if database already exists
-        /// </summary>
-        /// <param name="settings">Settings with database name</param>
-        /// <returns></returns>
+        /// <inheritdoc />
         public bool IsDatabaseExists(PostgresConnectionSettings settings)
         {
             using var conn = GetConnection(settings.GetConnectionStringToServer().ConnectionString);
@@ -102,10 +118,7 @@ namespace PoissonSoft.PostgresUtils
             return settings.Database.ToLowerInvariant() == res?.ToLowerInvariant();
         }
 
-        /// <summary>
-        /// Create database with given name
-        /// </summary>
-        /// <param name="settings"></param>
+        /// <inheritdoc />
         public void CreateDatabaseIfNotExists(PostgresConnectionSettings settings)
         {
             if (IsDatabaseExists(settings) == false)
