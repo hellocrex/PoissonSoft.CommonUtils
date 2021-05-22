@@ -37,6 +37,8 @@ namespace PoissonSoft.PostgresUtils
         /// </summary>
         public bool RequireSsl { get; set; } = true;
 
+        public string DefaultDatabase { get; set; }
+
         /// <summary>
         /// Get connection string builder to database
         /// </summary>
@@ -61,6 +63,10 @@ namespace PoissonSoft.PostgresUtils
             if (Port.HasValue)
                 connectionString["Port"] = Port.ToString();
             connectionString["Host"] = Host;
+            if (string.IsNullOrWhiteSpace(DefaultDatabase) == false)
+            {
+                connectionString["Database"] = DefaultDatabase;
+            }
             if (RequireSsl)
             {
                 connectionString["SSL Mode"] = "Require";

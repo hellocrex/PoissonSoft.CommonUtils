@@ -67,25 +67,24 @@ namespace PoissonSoft.PostgresUtils.Migrations
         }
 
         /// <inheritdoc />
-        public IReadOnlyCollection<Type> GetMigrationTypes()
-        {
-            return new[]
-            {
-                baseMigrationType
-            };
-        }
-
-        /// <inheritdoc />
-        public void SaveMigrationData(int version, DateTimeOffset startMigrationTime, DateTimeOffset finishMigrationTime)
+        public void SaveMigrationData(int version, bool complete, DateTimeOffset dateTime)
         {
             using var conn = getDbConnection(connectionSettings.GetConnectionStringBuilder().ConnectionString);
             conn.CreateTableIfNotExists<SimpleMigrationInfo>();
-            conn.Save(new SimpleMigrationInfo
+            if (complete == false)
             {
-                Version = version,
-                FinishMigrationTimestamp = finishMigrationTime,
-                StartMigrationTimestamp = startMigrationTime
-            });
+                conn.Save(new SimpleMigrationInfo
+                {
+                    Id = 1,
+                    Version = version,
+                    StartMigrationTimestamp = dateTime
+                });
+            }
+            else
+            {
+                conn.UpdateAdd(() => new SimpleMigrationInfo { FinishMigrationTimestamp = dateTime, Complete = complete },
+                    conn.From<SimpleMigrationInfo>().Where(s => s.Id == 1));
+            }
         }
     }
 }

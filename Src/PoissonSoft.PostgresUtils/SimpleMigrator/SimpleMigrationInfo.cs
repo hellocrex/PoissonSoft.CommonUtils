@@ -11,7 +11,8 @@ namespace PoissonSoft.PostgresUtils.Migrations
         [AutoIncrement]
         public int Id { get; set; }
         public int Version { get; set; }
+        public bool Complete { get; set; }
         public DateTimeOffset StartMigrationTimestamp { get; set; }
-        public DateTimeOffset FinishMigrationTimestamp { get; set; }
+        public DateTimeOffset? FinishMigrationTimestamp { get; set; }
     }
 }
