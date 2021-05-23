@@ -8,8 +8,7 @@ namespace PoissonSoft.PostgresUtils.Migrations
     [Alias("_migrations_info")]
     class SimpleMigrationInfo
     {
-        [AutoIncrement]
-        public int Id { get; set; }
+        [PrimaryKey]
         public int Version { get; set; }
         public bool Complete { get; set; }
         public DateTimeOffset StartMigrationTimestamp { get; set; }

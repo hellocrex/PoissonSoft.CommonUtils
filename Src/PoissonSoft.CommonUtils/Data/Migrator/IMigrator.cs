@@ -1,4 +1,6 @@
-﻿namespace PoissonSoft.Data.Migrator
+﻿using System;
+
+namespace PoissonSoft.Data.Migrator
 {
     /// <summary>
     /// Interface of the db migrator

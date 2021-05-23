@@ -13,15 +13,16 @@ namespace PoissonSoft.PostgresUtils.Migrations
     {
         private readonly PostgresConnectionSettings connectionSettings;
         private readonly IPostgresHelper postgresHelper;
-        private readonly Type baseMigrationType = typeof(SimpleDbMigrationBase);
+        private readonly Type baseTypeOfMigrations;
         Func<string, IDbConnection> getDbConnection;
 
         /// <inheritdoc />
         public SimpleDbMigrationHelper(PostgresConnectionSettings connectionSettings, 
-            IPostgresHelper postgresHelper)
+            IPostgresHelper postgresHelper, Type baseTypeOfMigrations)
         {
             this.connectionSettings = connectionSettings ?? throw new ArgumentNullException(nameof(connectionSettings));
             this.postgresHelper = postgresHelper ?? throw new ArgumentNullException(nameof(postgresHelper));
+            this.baseTypeOfMigrations = baseTypeOfMigrations;
             getDbConnection = (s =>
             {
                 var conn = new Npgsql.NpgsqlConnection(s);
@@ -31,7 +32,7 @@ namespace PoissonSoft.PostgresUtils.Migrations
         }
 
         /// <inheritdoc />
-        public void CreateDatabaseIfNotExists()
+        public void CreateDatabaseIfNotExists(IDbConnection conn)
         {
             postgresHelper.CreateDatabaseIfNotExists(connectionSettings);
         }
@@ -39,7 +40,7 @@ namespace PoissonSoft.PostgresUtils.Migrations
         /// <inheritdoc />
         public int GetCurrentDbVersion()
         {
-            using var conn = getDbConnection(connectionSettings.GetConnectionStringBuilder().ConnectionString);
+            using var conn = GetDbConnection();
             if (conn.TableExists<SimpleMigrationInfo>() == false)
             {
                 return 0;
@@ -54,36 +55,28 @@ namespace PoissonSoft.PostgresUtils.Migrations
         }
 
         /// <inheritdoc />
-        public IReadOnlyCollection<IDbConnection> GetDbConnection(Type type)
+        public IDbConnection GetDbConnection()
         {
-            if (type.IsSubclassOf(baseMigrationType) == true)
-            {
-                return new[] { getDbConnection(connectionSettings.GetConnectionStringBuilder().ConnectionString) };
-            }
-            else
-            {
-                throw new InvalidOperationException("Unknown migration type");
-            }
+            return getDbConnection(connectionSettings.GetConnectionStringBuilder().ConnectionString);
         }
 
         /// <inheritdoc />
-        public void SaveMigrationData(int version, bool complete, DateTimeOffset dateTime)
+        public void SaveMigrationData(IDbConnection conn, int version, bool complete, DateTimeOffset dateTime)
         {
-            using var conn = getDbConnection(connectionSettings.GetConnectionStringBuilder().ConnectionString);
             conn.CreateTableIfNotExists<SimpleMigrationInfo>();
             if (complete == false)
             {
                 conn.Save(new SimpleMigrationInfo
                 {
-                    Id = 1,
                     Version = version,
+                    Complete = complete,
                     StartMigrationTimestamp = dateTime
                 });
             }
             else
             {
                 conn.UpdateAdd(() => new SimpleMigrationInfo { FinishMigrationTimestamp = dateTime, Complete = complete },
-                    conn.From<SimpleMigrationInfo>().Where(s => s.Id == 1));
+                    conn.From<SimpleMigrationInfo>().Where(s => s.Version == version));
             }
         }
     }
