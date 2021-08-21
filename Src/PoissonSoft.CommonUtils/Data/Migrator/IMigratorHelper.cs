@@ -18,6 +18,7 @@ namespace PoissonSoft.Data.Migrator
         /// <summary>
         /// Save data about current migration in database
         /// </summary>
+        /// <param name="conn"></param>
         /// <param name="version"></param>
         /// <param name="complete"></param>
         /// <param name="dateTime"></param>
@@ -26,7 +27,6 @@ namespace PoissonSoft.Data.Migrator
         /// <summary>
         /// Returns connections to database servers 
         /// </summary>
-        /// <param name="type">Type of the migration to determine which database connections we want to recieve</param>
         /// <returns></returns>
         IDbConnection GetDbConnection();
 

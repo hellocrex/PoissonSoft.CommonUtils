@@ -36,7 +36,9 @@ namespace PoissonSoft.PostgresUtils
         /// RequireSsl
         /// </summary>
         public bool RequireSsl { get; set; } = true;
-
+        /// <summary>
+        /// Default database
+        /// </summary>
         public string DefaultDatabase { get; set; }
 
         /// <summary>
