@@ -107,7 +107,18 @@ namespace PoissonSoft.PostgresUtils
         /// <inheritdoc />
         public bool IsDatabaseExists(PostgresConnectionSettings settings)
         {
-            using var conn = GetConnection(settings.GetConnectionStringToServer().ConnectionString);
+            try
+            {
+                string csWithDbName = settings.GetConnectionStringBuilder().ConnectionString;
+                using var connWithDbName = GetConnection(csWithDbName);
+                connWithDbName.Open();
+                return true;
+            }
+            catch
+            {
+            }
+            var cs = settings.GetConnectionStringToServer().ConnectionString;
+            using var conn = GetConnection(cs);
             conn.Open();
 
             using var cmd = new NpgsqlCommand();
