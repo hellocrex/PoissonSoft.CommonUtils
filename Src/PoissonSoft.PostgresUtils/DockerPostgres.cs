@@ -70,9 +70,11 @@ namespace PoissonSoft.PostgresUtils
                 Host = "localhost",
                 Password = password,
                 Port = Port,    
-                Database = "obligator"
+                Database = "testdb",
+                RequireSsl = false
             };
             postgresHelper.WaitTillDbStarting(DbSettings);
+            postgresHelper.CreateDatabaseIfNotExists(DbSettings);
         }
 
         /// <inheritdoc />
