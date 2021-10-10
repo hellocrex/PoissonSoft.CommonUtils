@@ -13,7 +13,7 @@ using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.InputFiles;
 
-namespace IccfBot
+namespace PoissonSoft.Telegram
 {
     public class TelegramSendMessageHandler : IRequestHandler<TelegramSendMessageRequest, TelegramSendMessageResponse>
     {
