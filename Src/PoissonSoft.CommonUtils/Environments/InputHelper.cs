@@ -100,6 +100,22 @@ namespace PoissonSoft.CommonUtils.ConsoleUtils
         }
 
         /// <summary>
+        /// Получение от пользователя значения <see cref="DateTimeOffset"/>
+        /// </summary>
+        /// <param name="message"></param>
+        /// <returns></returns>
+        public static DateTimeOffset GetDateTime(string message)
+        {
+            DateTimeOffset result;
+            do
+            {
+                Console.WriteLine(message);
+            }
+            while (!DateTimeOffset.TryParse(Console.ReadLine(), out result));
+            return result;
+        }
+
+        /// <summary>
         /// Получение от пользователя числа decimal
         /// </summary>
         /// <param name="message"></param>

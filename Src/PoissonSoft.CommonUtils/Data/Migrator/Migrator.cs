@@ -11,14 +11,24 @@ namespace PoissonSoft.Data.Migrator
     public class Migrator : IMigrator
     {
         readonly IMigrationHelper migrationHelper;
+        readonly Type baseTypeOfMigrations;
+        readonly IReadOnlyCollection<MigrationBase> migrations;
 
-        /// <summary>
-        /// Creating an instance of the migrator
-        /// </summary>
-        /// <param name="migrationHelper"></param>
-        public Migrator(IMigrationHelper migrationHelper)
+        /// <inheritdoc />
+        public Migrator(Type baseTypeOfMigrations, Func<Type, IMigrationHelper> migrationHelperFactory)
         {
-            this.migrationHelper = migrationHelper ?? throw new ArgumentNullException(nameof(migrationHelper));
+            this.baseTypeOfMigrations = baseTypeOfMigrations;
+            this.migrationHelper = migrationHelperFactory(baseTypeOfMigrations) ?? throw new ArgumentNullException(nameof(migrationHelper));
+            this.migrations = GetMigrationsFromCurrentAppDomain(baseTypeOfMigrations);
+        }
+
+        /// <inheritdoc />
+        public bool IsOwnDbSchemeOutdated()
+        {
+
+            var currentDbVersion = migrationHelper.GetCurrentDbVersion();
+            var currentVersionOwnMigrations = migrations.Max(m => m.Version);
+            return currentDbVersion > currentVersionOwnMigrations;
         }
 
         /// <summary>
@@ -28,7 +38,6 @@ namespace PoissonSoft.Data.Migrator
         public int Migrate()
         {
             Trace.TraceInformation($"Starting db migration...");
-            var migrations = GetMigrationsFromCurrentAppDomain();
 
             if (migrations is null)
             {
@@ -41,7 +50,10 @@ namespace PoissonSoft.Data.Migrator
                 throw new InvalidOperationException("There were one or any migration wrong.");
             }
 
-            migrationHelper.CreateDatabaseIfNotExists();
+            // Prepare connections
+            using var conn = migrationHelper.GetDbConnection();
+
+            migrationHelper.CreateDatabaseIfNotExists(conn);
 
             var currentDbVersion = migrationHelper.GetCurrentDbVersion();
 
@@ -55,32 +67,23 @@ namespace PoissonSoft.Data.Migrator
                 return currentDbVersion;
             }
 
-            // Prepare connections
-            var connections = actualMigrations.Select(m => m.GetType()).Distinct().ToDictionary(t => t,
-                t => migrationHelper.GetDbConnection(t));
-            var allConnections = connections.Values.SelectMany(cc => cc).ToList();
+
 
             // Applying migrations to the servers
             foreach (var migration in actualMigrations.OrderBy(m => m.Version))
             {
                 var start = DateTimeOffset.UtcNow;
+                migrationHelper.SaveMigrationData(conn, migration.Version, false, start);
 
-                foreach (var conn in connections[migration.GetType()])
-                {
-                    migration.ApplyMigration(conn);
-                }
+                migration.ApplyMigration(conn);
 
                 var finish = DateTimeOffset.UtcNow;
                 currentDbVersion = migration.Version;
-                migrationHelper.SaveMigrationData(currentDbVersion, start, finish);
+                migrationHelper.SaveMigrationData(conn, currentDbVersion, true, finish);
                 Trace.TraceInformation($"Ьigration to version {currentDbVersion} completed successfully");
             }
 
-            // Утилизируем подключения 
-            foreach (var conn in allConnections)
-            {
-                conn.Dispose();
-            }
+            conn.Dispose();
 
             return currentDbVersion;
         }
@@ -89,9 +92,8 @@ namespace PoissonSoft.Data.Migrator
         /// Get instances for migration by given type of migration
         /// </summary>
         /// <returns>Collection of migrations to applying to db</returns>
-        IReadOnlyCollection<MigrationBase> GetMigrationsFromCurrentAppDomain()
+        IReadOnlyCollection<MigrationBase> GetMigrationsFromCurrentAppDomain(params Type[] migrationTypes)
         {
-            var migrationTypes = migrationHelper.GetMigrationTypes();
             var assemblies = migrationTypes.Select(t => t.Assembly).Distinct().ToArray();
             var migrations = AppDomain.CurrentDomain.GetAssemblies()
                 .Where(a => assemblies.Any(a.Equals))

@@ -12,17 +12,17 @@ namespace PoissonSoft.PostgresUtils.Migrations
     public class SimpleDbMigrationHelper : IMigrationHelper
     {
         private readonly PostgresConnectionSettings connectionSettings;
-        private readonly PostgresHelper postgresHelper;
-        private readonly Type baseMigrationType;
+        private readonly IPostgresHelper postgresHelper;
+        private readonly Type baseTypeOfMigrations;
         Func<string, IDbConnection> getDbConnection;
 
         /// <inheritdoc />
         public SimpleDbMigrationHelper(PostgresConnectionSettings connectionSettings, 
-            PostgresHelper postgresHelper, Type baseMigrationType)
+            IPostgresHelper postgresHelper, Type baseTypeOfMigrations)
         {
             this.connectionSettings = connectionSettings ?? throw new ArgumentNullException(nameof(connectionSettings));
             this.postgresHelper = postgresHelper ?? throw new ArgumentNullException(nameof(postgresHelper));
-            this.baseMigrationType = baseMigrationType ?? throw new ArgumentNullException(nameof(baseMigrationType));
+            this.baseTypeOfMigrations = baseTypeOfMigrations;
             getDbConnection = (s =>
             {
                 var conn = new Npgsql.NpgsqlConnection(s);
@@ -32,7 +32,7 @@ namespace PoissonSoft.PostgresUtils.Migrations
         }
 
         /// <inheritdoc />
-        public void CreateDatabaseIfNotExists()
+        public void CreateDatabaseIfNotExists(IDbConnection conn)
         {
             postgresHelper.CreateDatabaseIfNotExists(connectionSettings);
         }
@@ -40,7 +40,7 @@ namespace PoissonSoft.PostgresUtils.Migrations
         /// <inheritdoc />
         public int GetCurrentDbVersion()
         {
-            using var conn = getDbConnection(connectionSettings.GetConnectionStringBuilder().ConnectionString);
+            using var conn = GetDbConnection();
             if (conn.TableExists<SimpleMigrationInfo>() == false)
             {
                 return 0;
@@ -55,38 +55,29 @@ namespace PoissonSoft.PostgresUtils.Migrations
         }
 
         /// <inheritdoc />
-        public IReadOnlyCollection<IDbConnection> GetDbConnection(Type type)
+        public IDbConnection GetDbConnection()
         {
-            if (type.IsSubclassOf(baseMigrationType) == true)
+            return getDbConnection(connectionSettings.GetConnectionStringBuilder().ConnectionString);
+        }
+
+        /// <inheritdoc />
+        public void SaveMigrationData(IDbConnection conn, int version, bool complete, DateTimeOffset dateTime)
+        {
+            conn.CreateTableIfNotExists<SimpleMigrationInfo>();
+            if (complete == false)
             {
-                return new[] { getDbConnection(connectionSettings.GetConnectionStringBuilder().ConnectionString) };
+                conn.Save(new SimpleMigrationInfo
+                {
+                    Version = version,
+                    Complete = complete,
+                    StartMigrationTimestamp = dateTime
+                });
             }
             else
             {
-                throw new InvalidOperationException("Unknown migration type");
+                conn.UpdateAdd(() => new SimpleMigrationInfo { FinishMigrationTimestamp = dateTime, Complete = complete },
+                    conn.From<SimpleMigrationInfo>().Where(s => s.Version == version));
             }
-        }
-
-        /// <inheritdoc />
-        public IReadOnlyCollection<Type> GetMigrationTypes()
-        {
-            return new[]
-            {
-                baseMigrationType
-            };
-        }
-
-        /// <inheritdoc />
-        public void SaveMigrationData(int version, DateTimeOffset startMigrationTime, DateTimeOffset finishMigrationTime)
-        {
-            using var conn = getDbConnection(connectionSettings.GetConnectionStringBuilder().ConnectionString);
-            conn.CreateTableIfNotExists<SimpleMigrationInfo>();
-            conn.Save(new SimpleMigrationInfo
-            {
-                Version = version,
-                FinishMigrationTimestamp = finishMigrationTime,
-                StartMigrationTimestamp = startMigrationTime
-            });
         }
     }
 }

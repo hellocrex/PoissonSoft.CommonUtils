@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace PoissonSoft.CommonUtils.Data
 {
@@ -11,9 +12,15 @@ namespace PoissonSoft.CommonUtils.Data
     public interface IDbConnectionFactory
     {
         /// <summary>
-        /// Get the connection
+        /// Get the connection with openning
         /// </summary>
         /// <returns></returns>
         IDbConnection GetConnection();
+
+        /// <summary>
+        /// Get the connection with openning async
+        /// </summary>
+        /// <returns></returns>
+        Task<IDbConnection> GetConnectionAsync();
     }
 }

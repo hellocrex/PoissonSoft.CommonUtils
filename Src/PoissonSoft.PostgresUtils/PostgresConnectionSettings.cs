@@ -1,6 +1,8 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Data.Common;
+using System.IO;
 using System.Text;
 
 namespace PoissonSoft.PostgresUtils
@@ -30,6 +32,14 @@ namespace PoissonSoft.PostgresUtils
         /// Database name
         /// </summary>
         public string Database { get; set; }
+        /// <summary>
+        /// RequireSsl
+        /// </summary>
+        public bool RequireSsl { get; set; } = true;
+        /// <summary>
+        /// Default database
+        /// </summary>
+        public string DefaultDatabase { get; set; }
 
         /// <summary>
         /// Get connection string builder to database
@@ -55,7 +65,28 @@ namespace PoissonSoft.PostgresUtils
             if (Port.HasValue)
                 connectionString["Port"] = Port.ToString();
             connectionString["Host"] = Host;
+            if (string.IsNullOrWhiteSpace(DefaultDatabase) == false)
+            {
+                connectionString["Database"] = DefaultDatabase;
+            }
+            if (RequireSsl)
+            {
+                connectionString["SSL Mode"] = "Require";
+                connectionString["Trust Server Certificate"] = true;
+            }
             return connectionString;
         }
-    }
+
+
+        /// <summary>
+        /// Load this config from file
+        /// </summary>
+        /// <param name="path"></param>
+        /// <returns></returns>
+        public static PostgresConnectionSettings LoadConfig(string path)
+        {
+            var json = File.ReadAllText(path);
+            return JsonConvert.DeserializeObject<PostgresConnectionSettings>(json);
+        }
+    } 
 }

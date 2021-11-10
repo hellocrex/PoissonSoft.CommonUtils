@@ -69,5 +69,28 @@ namespace PoissonSoft.CommonUtils.Maths
             }
             return factor > 0 ? step * (decimal)Math.Pow(10, factor) : step;
         }
+
+        /// <summary>
+        /// Округляет число до определенного количества значащих цифр
+        /// </summary>
+        /// <param name="val"></param>
+        /// <param name="cnt"></param>
+        /// <returns></returns>
+        public static decimal RoundSignDigits(decimal val, int cnt)
+        {
+            var degree = Math.Log(Convert.ToDouble(val)) / Math.Log(0.1);
+            var startDigit = Convert.ToInt32(Math.Round(degree));
+            var lastDigit = startDigit + cnt - 1;
+            if (lastDigit >= 0)
+            {
+                return Math.Round(val, lastDigit);
+            } 
+            else
+            {
+                var ceil = Convert.ToInt32(Math.Round(val, 0));
+                var basis = Convert.ToInt32(Math.Pow(ceil, -lastDigit));
+                return (ceil / basis) * basis;
+            }
+        }
     }
 }
